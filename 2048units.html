@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html style="width: 99%;height: 99%;">
+
+<head>
+    <meta name="viewport" content="width=device-width,height=window-height, initial-scale=1.0">
+    <title>2048 Units</title>
+</head>
+<style type="text/css">
+    /* .grid{
+      background-color:#aaaaaa;
+    } */
+
+    .grid td {
+        background-color: #222222;
+    }
+
+    body {
+        background-color: #222222;
+        width: 95%;
+        height: 95%;
+    }
+
+    .cell {
+        border-radius: 5%;
+        border-style: none;
+        text-align: center;
+        position: absolute;
+        --margin: 2%;
+        --size: calc((100% - 2% * 5) / 4);
+        --x: 0;
+        --y: 0;
+        margin: var(--margin);
+        width: var(--size);
+        height: var(--size);
+        left: calc(var(--x) * (var(--size) + var(--margin)));
+        top: calc(var(--y) * (var(--size) + var(--margin)));
+        offset-anchor: center;
+        font-size: larger;
+    }
+
+    .fg {
+        background-color: #808080;
+        z-index: 3;
+        transition: left 0.2s, top 0.2s ease-in;
+        -webkit-transition: left 0.2s, top 0.2s ease-in;
+        animation: spawn 0.3s ease-in;
+    }
+
+    .bg {
+        background-color: #333333;
+        z-index: 1;
+    }
+
+    .info_cell {
+        background-color: #808080;
+        border-radius: 5%;
+        border-style: none;
+        text-align: center;
+        position: relative;
+        float: left;
+        margin: 0.2rem;
+        width: 3em;
+        height: 3em;
+        z-index: 3;
+        offset-anchor: center;
+        font-size: large;
+        text-align: center;
+    }
+
+    .cellLabel {
+        font-family: sans-serif;
+        text-align: center;
+        margin: 0px;
+        position: absolute;
+        font-size: 1rem;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -60%);
+    }
+
+    .cellCornerMark {
+        font-family: sans-serif;
+        text-align: center;
+        margin: 0px;
+        position: absolute;
+        font-size: 1rem;
+        top: 90%;
+        left: 90%;
+        transform: translate(-100%, -100%);
+    }
+
+    .largeFont {
+        font-size: 2rem;
+    }
+
+    .plate {
+        background-color: #333333;
+        border-radius: 0.7rem;
+        border-style: none;
+        z-index: 1;
+        margin: 0.5rem;
+    }
+
+    textarea {
+        font-family: sans-serif;
+        background-color: #222222;
+        color: #ffffff;
+        border-radius: 0.5rem;
+        margin: 0.3rem;
+        border-width: 0;
+    }
+
+    div {
+        font-family: sans-serif;
+        color: #ffffff;
+    }
+
+    p {
+        font-family: sans-serif;
+        text-align: center;
+        color: #ffffff;
+        margin: 0.2rem;
+        width: 100%;
+    }
+
+    button {
+        color: #ffffff;
+        background-color: #606060;
+        margin: 0.2rem;
+        border-radius: 0.5rem;
+        border-width: 0;
+        padding: 0.5rem;
+    }
+
+    button:hover {
+        background-color: #808080;
+    }
+
+    button:active {
+        background-color: #222222;
+    }
+
+    @keyframes spawn {
+        0% {
+            scale: 110%;
+        }
+
+        100% {
+            scale: 100%;
+        }
+    }
+</style>
+
+<body>
+    <div style="float: left;width: min(max-content, 100%) ;height: fit-content;">
+        <div class="info" style="float:left;width: 100%;">
+            <div style="float: left;">
+                <p style="font-size: xxx-large;margin: 0;">2048 Units</p>
+            </div>
+            <div class="plate" style="float: left;padding: 0.5rem;">
+                <div style="float: left;margin: 0.2rem;">
+                    <p style="text-align: center;">SCORE</p>
+                    <p id="score" style="text-align: center;"></p>
+                </div>
+                <div style="float: left;margin: 0.2rem;">
+                    <p style="text-align: center;">COMPLEXITY</p>
+                    <p id="complexity" style="text-align: center;"></p>
+                </div>
+                <button id="buttonUndo" onclick="undo()" style="flex:1">UNDO</button>
+            </div>
+        </div>
+        <div class="area" style="float: left;width: 100%;aspect-ratio: 1;position: relative;">
+            <div id="bg" class="grid"
+                style="width: 100%;aspect-ratio: 1;position: absolute;border-radius: 2%;background-color: #444444;">
+                <div id="bggrid" class="grid" style="width: 100%;height: 100%;position: absolute;">
+
+                </div>
+                <div id="gamegrid" class="grid" style="width: 100%;height: 100%;position: absolute;">
+
+                </div>
+                <div id="touchArea" style="width: 100%;height: 100%;position: absolute;z-index: 100;">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="otherinfo" style="float: left;max-height: 100%;max-width:28.5rem;">
+        <div class="plate" style="float: inline-start;padding: 0.3rem;">
+            <p>Discovered Units:</p>
+            <div id="discoveredUnits" style="float: inline-start; width: 100%;height: auto;">
+
+            </div>
+        </div>
+
+        <div class="plate" style="float:inline-start;">
+            <p>Save & Load:</p>
+            <button onclick="saveGame()">
+                Save
+            </button>
+            <button onclick="loadGame()">
+                Load
+            </button>
+            <button onclick="newGame()">
+                New Game
+            </button>
+            <form>
+                <textarea id="leveldata" style="max-width: 30em;">
+
+                </textarea>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+
+    "use strict";
+    const DIR_UP = 0
+    const DIR_RIGHT = 1
+    const DIR_DOWN = 2
+    const DIR_LEFT = 3
+    const gamegrid = document.getElementById("gamegrid")
+    const bggrid = document.getElementById("bggrid")
+    const discoveredUnitsElement = document.getElementById("discoveredUnits")
+    const WIDTH = 4
+    const HEIGHT = 4
+
+    var debug = false
+
+
+    //Ingame Variables
+    var undos = []
+    var cells = []
+    var gameState = {
+        score: 0,
+        unlockedUnits: ["m1"],
+        discoveredUnits: [],
+    }
+
+    function resetVariables() {
+        cells = [],
+            gameState = {
+                score: 0,
+                unlockedUnits: ["m1"],
+                discoveredUnits: [],
+            }
+    }
+
+    //Used after every round
+    var wait = false
+    var cellsToDelete = []
+    //Get and set cell in the grid
+    function getCell(x, y) {
+        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+            return cells[y][x]
+        } else {
+            return undefined
+        }
+    }
+    function setCell(x, y, cell) {
+        if (x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT) {
+            cells[y][x] = cell
+        }
+    }
+    function getSide(x, y, side) {
+        if (side == DIR_UP) {
+            return [x, y - 1]
+        }
+        else if (side == DIR_DOWN) {
+            return [x, y + 1]
+        }
+        else if (side == DIR_LEFT) {
+            return [x - 1, y]
+        }
+        else if (side == DIR_RIGHT) {
+            return [x + 1, y]
+        } else {
+            return undefined
+        }
+    }
+    function getSideCell(x, y, side) {
+        var [x, y] = getSide(x, y, side)
+        return getCell(x, y)
+    }
+
+    function logDebug(data) {
+        if (debug)
+            console.log(data)
+    }
+
+    function spawnCells(count = 2) {
+        var emptyCells = []
+        //Get empty cells for spawning
+        for (let y = 0; y < HEIGHT; y++) {
+            for (let x = 0; x < WIDTH; x++) {
+                if (getCell(x, y) === null) {
+                    emptyCells[emptyCells.length] = [x, y]
+                }
+            }
+        }
+        //Spawn cells
+        for (let index = 0; index < count; index++) {
+            if (emptyCells.length == 0) {
+                logDebug(`out of space`)
+                return
+            }
+            var chosenCell = Math.floor(Math.random() * emptyCells.length);
+            var [x, y] = emptyCells.splice(chosenCell, 1)[0]    //Dont spawn on same cell
+            new cellGrid(x, y, getUnitFromID(gameState.unlockedUnits[Math.floor(Math.random() * gameState.unlockedUnits.length)]))
+        }
+    }
+    const KEYMAPPING = {
+        ArrowUp: DIR_UP,
+        ArrowDown: DIR_DOWN,
+        ArrowLeft: DIR_LEFT,
+        ArrowRight: DIR_RIGHT,
+        w: DIR_UP,
+        s: DIR_DOWN,
+        a: DIR_LEFT,
+        d: DIR_RIGHT,
+    }
+    //Handle keyboard event
+    function onkeydown(event) {
+        logDebug(event)
+        if (wait) { return }
+        if (document.activeElement instanceof HTMLTextAreaElement) { return }
+
+        if (KEYMAPPING[event.key] != null) {
+            move(KEYMAPPING[event.key])
+        } else if (event.key == "Backspace" || event.key == "z") {
+            undo()
+        }
+        else {
+            return
+        }
+        event.preventDefault()
+    }
+    //Handle touch and mouse event
+    var touchDown = 0
+    var touchX = 0
+    var touchY = 0
+    function onTouch(event) {
+        var touchPos
+        if (event instanceof TouchEvent) {
+            touchPos = { x: event.changedTouches[0].clientX, y: event.changedTouches[0].clientY }
+        } else if (event instanceof MouseEvent) {
+            touchPos = { x: event.clientX, y: event.clientY }
+            if (event.button == 2 && event.type == "mouseup") {
+                undo()
+            }
+        }
+        if (event.type == "touchstart" || event.type == "mousedown") {
+            touchX = touchPos.x
+            touchY = touchPos.y
+        }
+        else if (event.type == "mouseup" || event.type == "touchend" && event.touches.length == 0) {
+            var dx = touchPos.x - touchX
+            var dy = touchPos.y - touchY
+            var length = 100
+            if (Math.abs(dx / dy) > 1.5) {
+                if (dx > length) {
+                    move(DIR_RIGHT)
+                } else if (dx < -length) {
+                    move(DIR_LEFT)
+                }
+            } else if (Math.abs(dy / dx) > 1.5) {
+                if (dy > length) {
+                    move(DIR_DOWN)
+                } else if (dy < -length) {
+                    move(DIR_UP)
+                }
+            }
+            logDebug(dx + " " + dy)
+        }
+        event.preventDefault()
+        logDebug(event.type + " " + touchPos.x + " " + touchPos.y)
+        logDebug(event)
+    }
+
+    //Coloring
+    function getColor(units) {
+        var color = 0x808080
+        if (units.m != null) {
+            color += units.m * 0x202000
+        }
+        if (units.s != null) {
+            color -= units.s * 0x2700
+        }
+        if (units.kg != null) {
+            color += units.kg * 0x270000
+        }
+        if (units.A != null) {
+            color += units.A * 0x27
+        }
+        return color.toString(16)
+    }
+    //Logic
+    function multiply(units1, units2) {
+        var units3 = {}
+        for (const key in units1) { //multiply units1
+            units3[key] = units1[key]
+        }
+        for (const key in units2) {  //multiply units2
+            if (units1[key] != null) {
+                units3[key] = units1[key] + units2[key]
+            } else {
+                units3[key] = units2[key]
+            }
+        }
+        return units3
+    }
+    function divide(units1, units2) {
+        var units3 = {}
+        for (const key in units1) { //multiply units1
+            units3[key] = units1[key]
+        }
+        for (const key in units2) {  //divide by units2
+            if (units1[key] != null) {
+                units3[key] = units1[key] - units2[key]
+            } else {
+                units3[key] = -units2[key]
+            }
+        }
+        return units3
+    }
+
+    const unitNameDict = {
+        m1: ["m", "L"],
+        m2: ["m²", "S"],
+        m3: ["m³", "V"],
+        s1: ["s", "t"],
+        s_1: ["Hz", "f"],
+        m1s_1: ["m/s", "v"],
+        m1s_2: ["m/s²", "a"],
+        kg1: ["kg", "m"],
+        m_3kg1: ["kg/m³", "ρ"],
+        m1s_2kg1: ["N", "F,G"],
+        m1s_1kg1: ["<div style='font-size:80%;'>kg⋅m/s\nN⋅s</div>", "P,I"],
+        m_1s_2kg1: ["Pa", "p"],
+        m2s_2kg1: ["J", "E,W,Q"],
+        m2s_3kg1: ["W", "P"],
+        A1: ["A", "I"],
+        s1A1: ["C", "Q"],
+        m_1A1: ["A/m", "H"],
+        m2s_3kg1A_1: ["V", "U,E,φ"],
+        m1s_3kg1A_1: ["V/m", "E"],
+        m2s_3kg1A_2: ["Ω", "R"],
+        m_2s4kg_1A2: ["F", "C"],
+        s_2kg1A_1: ["T", "B"],
+        m2s_2kg1A_1: ["Wb", "Φ"],
+    }
+    const unitBase = ["m", "s", "kg", "A"]
+    //Unit IDs and names
+    function getUnitID(units) {
+        var unitID = ""
+        for (const key in unitBase) {
+            var unit = unitBase[key]
+            if (units[unit] && units[unit] != 0) {
+                unitID += (unit + units[unit]).replace("-", "_")
+            }
+        }
+        unitID = unitID
+        return unitID
+    }
+    function getUnitFromID(unitID = "") {
+        if (!unitID) return {}
+        var unit = {}
+        var matched = unitID.matchAll("([a-zA-Z]+)(_?[0-9]+)")
+        for (const match of matched) {
+            unit[match[1]] = Number.parseInt(match[2].replace("_", "-"))
+        }
+        return unit
+    }
+    function getUnitName(units) {
+        var unitID = getUnitID(units)
+        return getUnitNameFromID(unitID)
+    }
+    function getUnitNameFromID(unitID) {
+        if (unitID.length == 0) { return "1" }
+        if (unitNameDict[unitID] == null) { return undefined }
+        return unitNameDict[unitID][0]
+    }
+    function getSymbol(unitID) {
+        if (unitID.length == 0) { return "" }
+        if (unitNameDict[unitID] == null) { return undefined }
+        return unitNameDict[unitID][1]
+    }
+    function getRawName(units) {
+        var name = ""
+        for (const key in units) {
+            name += (key + "=" + units[key])
+        }
+        return name
+    }
+    //Cell
+    class cellGrid {
+        constructor(x, y, units = { m: 1 }) {
+            if (getCell(x, y) === undefined) {
+                logDebug(`${x},${y} is out of bounds`)
+                return
+            } else if (getCell(x, y) instanceof cellGrid) {
+                logDebug(`replacing ${x},${y}`)
+                getCell(x, y).remove()
+            }
+            this.units = units
+            this.x = parseInt(x)
+            this.y = parseInt(y)
+            this.cell = document.createElement("div")
+            this.cell.classList.add("cell")
+            this.cell.classList.add("fg")
+            gamegrid.appendChild(this.cell)
+            this.updateVisuals()
+            this.updatePosition()
+            setCell(x, y, this)
+        }
+        updateVisuals() {
+            this.cell.innerHTML = "<div class='cellLabel largeFont'>" + this.getName() + "</div>" + "<div class='cellCornerMark'>" + this.getSymbol() + "</div>"
+            this.cell.style.backgroundColor = "#" + this.getColor()
+        }
+        updatePosition() {
+            this.cell.style.setProperty("--x", this.x)
+            this.cell.style.setProperty("--y", this.y)
+            // this.cell.style.left = this.x * 125 + "px"
+            // this.cell.style.top = this.y * 125 + "px"
+        }
+        getUnitID() {
+            return getUnitID(this.units)
+        }
+        getName() {
+            return getUnitName(this.units) || getUnitID(this.units)
+        }
+        getSymbol() {
+            return getSymbol(this.getUnitID())
+        }
+        getColor() {
+            return getColor(this.units)
+        }
+        canMerge(obj, dir) {
+            if (obj instanceof cellGrid) {
+                if (dir == DIR_UP) {
+                    return getUnitName(divide(obj.units, this.units)) != null
+                } else if (dir == DIR_DOWN) {
+                    return getUnitName(divide(this.units, obj.units)) != null
+                } else {
+                    return getUnitName(multiply(this.units, obj.units)) != null
+                }
+            }
+        }
+        move(dir) {
+            var y2 = this.y
+            var x2 = this.x
+            var success = 0
+            while (getSideCell(x2, y2, dir) === null) {
+                var [x2, y2] = getSide(x2, y2, dir)
+            }
+            success ||= this.relocate(x2, y2)
+            var [x3, y3] = getSide(x2, y2, dir)
+            success ||= this.tryMerge(x3, y3, dir)
+            return success > 0
+        }
+        relocate(x, y) {
+            if (x == this.x && y == this.y) {
+                logDebug(`Already at ${x},${y}`)
+                return false
+            }
+            if (getCell(x, y) !== null) {
+                logDebug(`${x},${y} isn't empty`)
+                return false
+            }
+            logDebug(`moving ${this.x},${this.y} to ${x},${y}`)
+            setCell(this.x, this.y, null)
+            this.x = x
+            this.y = y
+            setCell(x, y, this)
+            this.updatePosition()
+            return true
+        }
+        tryMerge(x, y, dir) {
+            var cell2 = getCell(x, y)
+            if (!this.canMerge(cell2, dir)) { return false }
+            cell2.remove()
+            var newUnits
+            if (dir == DIR_DOWN) {
+                newUnits = divide(this.units, cell2.units)
+            } else if (dir == DIR_UP) {
+                newUnits = divide(cell2.units, this.units)
+            } else {
+                newUnits = multiply(this.units, cell2.units)
+            }
+            this.relocate(x, y)
+            this.remove()
+            new cellGrid(x, y, newUnits)
+        }
+        remove() {
+            setCell(this.x, this.y, null)
+            cellsToDelete.push(this.cell)
+            this.cell.style.zIndex = 2
+        }
+    }
+    //init scripts
+    function initGrid() {
+        cells = []
+        for (let y = 0; y < HEIGHT; y++) {
+            var row = []
+            for (let x = 0; x < WIDTH; x++) {
+                var cell = document.createElement("div")
+                cell.classList.add("cell")
+                cell.classList.add("bg")
+                cell.style.float = "left"
+                cell.style.setProperty("--x", x)
+                cell.style.setProperty("--y", y)
+                // cell.style.left = x * 125 + "px"
+                // cell.style.top = y * 125 + "px"
+                bggrid.appendChild(cell)
+                row[x] = null
+            }
+            cells[y] = row
+        }
+    }
+    function clear() {
+        while (bggrid.hasChildNodes()) {
+            bggrid.removeChild(bggrid.childNodes[0])
+        }
+        while (gamegrid.hasChildNodes()) {
+            gamegrid.removeChild(gamegrid.childNodes[0])
+        }
+        while (discoveredUnitsElement.hasChildNodes()) {
+            discoveredUnitsElement.removeChild(discoveredUnitsElement.childNodes[0])
+        }
+        gameState.discoveredUnits = []
+        gameState.score = 0
+    }
+    function newGame() {
+        clear()
+        resetVariables()
+        initGrid()
+        spawnCells(2)
+        updateRound()
+        logUndo()
+    }
+
+    //Move all cells in grid
+    function move(dir) {
+        var success = 0
+        if (dir == DIR_UP) {
+            for (let y = 0; y < HEIGHT; y++) {
+                for (let x = 0; x < WIDTH; x++) {
+                    trymove(x, y, dir)
+                }
+            }
+        } else if (dir == DIR_DOWN) {
+            for (let y = HEIGHT - 1; y >= 0; y--) {
+                for (let x = 0; x < WIDTH; x++) {
+                    trymove(x, y, dir)
+                }
+            }
+        } else if (dir == DIR_LEFT) {
+            for (let x = 0; x < HEIGHT; x++) {
+                for (let y = 0; y < WIDTH; y++) {
+                    trymove(x, y, dir)
+                }
+            }
+        } else if (dir == DIR_RIGHT) {
+            for (let x = HEIGHT - 1; x >= 0; x--) {
+                for (let y = 0; y < WIDTH; y++) {
+                    trymove(x, y, dir)
+                }
+            }
+        }
+        if (success > 0) {
+            updateRound()
+            wait = true
+            setTimeout(() => {
+                spawnCells(1)
+                afterRound()
+                wait = false
+            }, 200);
+        }
+        function trymove(x, y, dir) {
+            if (getCell(x, y) instanceof cellGrid) {
+                if (getCell(x, y).move(dir)) {
+                    success += 1
+                }
+            } else {
+                return false
+            }
+        }
+    }
+
+    //Update when doing a round
+    function updateRound() {
+        var complexity = 0
+        for (const y in cells) {
+            var row = cells[y]
+            for (const x in row) {
+                var cell = row[x]
+                if (cell instanceof cellGrid) {
+                    for (const key in cell.units) {
+                        var power = cell.units[key]
+                        complexity += Math.abs(power)
+                    }
+                    var units = cell.units
+                    var unitID = getUnitID(cell.units)
+                    if (!gameState.discoveredUnits.includes(unitID)) {
+                        pushDiscovered(unitID)
+                    }
+                }
+            }
+        }
+        gameState.score = Math.max(gameState.score, complexity)
+        document.getElementById("complexity").textContent = complexity
+        document.getElementById("score").textContent = gameState.score
+        unlockNewUnitsWhenReady()
+    }
+    function pushDiscovered(unitID) {
+        gameState.discoveredUnits.push(unitID)
+        pushDiscoveredToWindow(unitID)
+    }
+    function pushDiscoveredToWindow(unitID) {
+        var newDiscovered = document.createElement("div")
+        newDiscovered.style.backgroundColor = "#" + getColor(getUnitFromID(unitID))
+        newDiscovered.classList.add("info_cell")
+        newDiscovered.innerHTML = "<p class='cellLabel'>" + (getUnitNameFromID(unitID) || unitID) + "</p>"
+        discoveredUnitsElement.appendChild(newDiscovered)
+    }
+    const unlockableUnits = {
+        s1: 3,
+        kg1: 8,
+        A1: 13
+    }
+    function unlockNewUnitsWhenReady() {
+        for (const unitID in unlockableUnits) {
+            if (!gameState.unlockedUnits.includes(unitID) && gameState.discoveredUnits.length >= unlockableUnits[unitID]) {
+                gameState.unlockedUnits.push(unitID)
+            }
+        }
+    }
+
+    //Update after completing a round
+    function afterRound() {
+        for (const y in cells) {
+            var row = cells[y]
+            for (const x in row) {
+                var cell = row[x]
+                if (cell instanceof cellGrid) {
+                    cell.updateVisuals()
+                }
+            }
+        }
+        for (const i in cellsToDelete) {
+            if (cellsToDelete[i].parentNode == gamegrid)
+                gamegrid.removeChild(cellsToDelete[i])
+        }
+        cellsToDelete = []
+        updateRound()
+        logUndo()
+        saveState()
+    }
+    function logUndo() {
+        undos.push(serialize())
+    }
+    function undo() {
+        if (undos.length < 2) {
+            logDebug("Nothing to undo!")
+            return
+        }
+        logDebug(undos[undos.length - 2])
+        loadGameFromData(undos[undos.length - 2])
+        undos.pop()
+    }
+    //Manipulate cellV2
+    function dumpGrid() {
+        var cellsToExportV2 = []
+        for (const y in cells) {
+            var rowToExport = []
+            var row = cells[y]
+            for (const x in row) {
+                var cell = row[x]
+                if (cell instanceof cellGrid) {
+                    rowToExport[x] = cell.units
+                } else {
+                    rowToExport[x] = null
+                }
+            }
+            cellsToExportV2[y] = rowToExport
+        }
+        return cellsToExportV2
+    }
+    function loadGrid(cellsV2) {
+        for (const y in cellsV2) {
+            var row = cellsV2[y]
+            for (const x in row) {
+                var cell = row[x]
+                if (cell != null) {
+                    new cellGrid(x, y, cell)
+                }
+            }
+        }
+    }
+    //Deprecated old save format
+    function saveGridV1() {
+        var cellsToExport = []
+        for (const y in cells) {
+            var row = cells[y]
+            for (const x in row) {
+                var cell = row[x]
+                if (cell instanceof cellGrid) {
+                    cellsToExport.push({ x: cell.x, y: cell.y, units: cell.units })
+                }
+            }
+        }
+
+        return cellsToExport
+    }
+    //save and load
+    function serialize() {
+        var savedata = Object.assign({}, gameState)
+        savedata.id = "2048units_savedata"
+        // savedata.cells=saveGridV1()
+        savedata.cellsV2 = dumpGrid()
+        return savedata
+    }
+    function saveGame() {
+        document.getElementById("leveldata").value = (JSON.stringify(serialize()))
+    }
+    function loadData() {
+        return JSON.parse(document.getElementById("leveldata").value)
+    }
+    function loadGame() {
+        var savedData = loadData()
+        loadGameFromData(savedData)
+        logUndo()
+    }
+    function loadGameFromData(savedData) {
+        clear()
+        initGrid()
+        if (savedData.id != "2048units_savedata") return
+        if (savedData.cellsV2 != null) {
+            loadGrid(savedData.cellsV2)
+        }
+        else if (savedData.cells != null) {
+            for (const i in savedData.cells) {
+                const cell = savedData.cells[i]
+                new cellGrid(cell.x, cell.y, cell.units)
+            }
+        }
+        if (savedData.score != null) {
+            gameState.score = savedData.score
+        } else {
+            gameState.score = 0
+        }
+        if (savedData.unlockedUnits != null) {
+            gameState.unlockedUnits = savedData.unlockedUnits
+        } else {
+            gameState.unlockedUnits = []
+        }
+        if (savedData.discoveredUnits != null) {
+            gameState.discoveredUnits = savedData.discoveredUnits
+            for (const key in gameState.discoveredUnits) {
+                pushDiscoveredToWindow(gameState.discoveredUnits[key])
+            }
+        } else {
+            gameState.discoveredUnits = []
+        }
+        updateRound()
+    }
+    //Save to cookie
+    function saveState(){
+        setCookie("state",JSON.stringify(serialize()))
+    }
+    function loadStateFromCookie(){
+        loadGameFromData(JSON.parse(getCookie("state")))
+    }
+    function setCookie(cname,cvalue){
+        document.cookie=cname+"="+cvalue+";SameSite=Strict;expires=Thu, 01 Jan 3000 00:00:00 GMT"
+    }
+    function removeCookie(cname){
+        document.cookie=cname+"=;SameSite=Strict;expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    }
+    function getCookie(cname)
+    {
+        return document.cookie
+            .split("; ")
+            .find((row) => row.startsWith(cname+"="))
+            ?.split("=")[1];
+    }
+
+    //Init code
+    window.addEventListener("keydown", onkeydown)
+    document.getElementById("touchArea").addEventListener("touchstart", onTouch)
+    document.getElementById("touchArea").addEventListener("touchmove", onTouch)
+    document.getElementById("touchArea").addEventListener("touchend", onTouch)
+    document.getElementById("touchArea").addEventListener("mousedown", onTouch)
+    document.getElementById("touchArea").addEventListener("mouseup", onTouch)
+    document.getElementById("touchArea").addEventListener("contextmenu", (event) => { event.preventDefault() })
+    window.addEventListener("beforeunload", (event) => { event.preventDefault(); event.returnValue = ("Are you sure? unsaved progress will be lost!") })
+    //Resume last game if there is
+    if(getCookie("state")){
+        loadStateFromCookie()
+    }else{
+        newGame()
+    }
+</script>
+
+</html>

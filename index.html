@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title>Beaker Lab</title>
+</head>
+<style type="text/css">
+  body {
+    background-color: #222222;
+    width: 95%;
+    height: 95%;
+  }
+
+  .plate {
+    background-color: #333333;
+    border-radius: 0.7rem;
+    border-style: none;
+    z-index: 1;
+    margin: 0.5rem;
+    padding: 0.5rem;
+    width: fit-content;
+  }
+
+  .plate2 {
+    background-color: #444444;
+    border-radius: 0.7rem;
+    border-style: none;
+    z-index: 1;
+    margin: 0.1rem;
+    padding: 1rem;
+    width: auto;
+  }
+
+  .flex-container {
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: row;
+    width: 95%;
+    flex-wrap: wrap;
+  }
+
+  .base1 {
+    min-width: 20rem;
+    flex: 1;
+  }
+
+  textarea {
+    font-family: sans-serif;
+    background-color: #222222;
+    border-radius: 0.5rem;
+    margin: 0.3rem;
+    border-width: 0;
+  }
+
+  * {
+    font-family: sans-serif;
+    color-scheme: dark;
+  }
+
+  p {
+    font-family: sans-serif;
+    margin: 0.2rem;
+    width: 100%;
+  }
+
+  button {
+    background-color: #606060;
+    margin: 0.2rem;
+    border-radius: 0.5rem;
+    border-width: 0;
+    padding: 0.5rem;
+  }
+
+  button:hover {
+    background-color: #808080;
+  }
+
+  button:active {
+    background-color: #222222;
+  }
+
+  @keyframes spawn {
+    0% {
+      scale: 110%;
+    }
+
+    100% {
+      scale: 100%;
+    }
+  }
+</style>
+
+<body>
+  <header></header>
+  <main>
+    <div>
+      <div style="align-content: center;">
+        <p style="font-size: large;text-align: center;">Welcome to Beaker Lab!</p>
+        <div>
+          <a href="https://github.com/Blue-Beaker">My Github</a>
+          <a href="https://www.curseforge.com/members/blue_beaker/projects">Curseforge</a>
+          <a href="https://modrinth.com/user/Blue-Beaker">Modrinth</a>
+        </div>
+      </div>
+    </div>
+    <div class="flex-container">
+      <div class="plate base1">
+        <p>Games</p>
+        <div class="plate2">
+          <p>2048 Units</p>
+          <a href="2048units.html">Play now</a> <a href="https://github.com/Blue-Beaker/2048-units">Source code</a>
+          <p>A 2048-like game based on Physical Units</p>
+        </div>
+      </div>
+      <div class="plate base1">
+        <p>Tools</p>
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/orangekvm-server">OrangeKVM</a>
+          <p>A simple ipkvm server with web interface. Made for orangepi zero, also usable on other linux devices.</p>
+          <a href="https://github.com/Blue-Beaker/9329KeyboardRemote">9329Remote</a>
+          <p>A tool that uses CH9329 to control another device. </p>
+        </div>
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/OctoPrint-PSUControl-OPi.GPIO">OctoPrint-PSUControl-OPi.GPIO</a>
+          <p>Adds OPi.GPIO to OctoPrint-PSUControl as a sub-plugin</p>
+        </div>
+      </div>
+      <div class="plate base1">
+        <p>Mods and Addons for Games</p>
+        Minecraft Resourcepacks
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/BlueBlocksMC">BlueBlocksMC</a>
+          <p>A resourcepack for minecraft</p>
+        </div>
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/BlueBlocksThermal">BlueBlocksThermal</a>
+          <p>A resourcepack for thermal mods</p>
+        </div>
+        Minecraft Mods
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/noGravity-mod">No Gravity</a>
+          <p>Removes Gravity for most things!</p>
+        </div>
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/noGravity-mod">Neon Selection Box</a>
+          <p>A Minecraft mod for tweaking block selection boxes.</p>
+        </div>
+      </div>
+      <div class="plate base1">
+        <p>Game Tools</p>
+        <div class="plate2">
+          <a href="https://github.com/Blue-Beaker/A-equals-B-emulator">A=B emulator</a>
+          <p>An emulator for A=B the game, written in python 3. </p>
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>Blue_Beaker 2023</footer>
+</body>
+
+</html>
