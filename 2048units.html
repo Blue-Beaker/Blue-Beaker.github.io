@@ -18,6 +18,7 @@
         background-color: #222222;
         width: 95%;
         height: 95%;
+        color-scheme: dark;
     }
 
     .cell {
@@ -101,6 +102,24 @@
         margin: 0.5rem;
     }
 
+    .toast {
+        background-color: #444444;
+        box-shadow: 0 0 1rem 0 #000000;
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        border-radius: 0.7rem;
+        border-style: none;
+        z-index: 1;
+        margin: 0.5rem;
+        padding: 1rem;
+        opacity: 0%;
+        z-index: 99;
+        transition: 0.3s ease-in;
+        max-width: calc(100vw - 5rem);
+    }
+
+
     textarea {
         font-family: sans-serif;
         background-color: #222222;
@@ -116,9 +135,7 @@
     }
 
     p {
-        font-family: sans-serif;
         text-align: center;
-        color: #ffffff;
         margin: 0.2rem;
         width: 100%;
     }
@@ -140,6 +157,34 @@
         background-color: #222222;
     }
 
+    .flex1 {
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .flex2 {
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: row;
+    }
+
+    .flex-col {
+        display: -webkit-flex;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .area {
+        width: 95vw;
+        min-width: 20rem;
+        max-width: 95vh;
+        flex: 4;
+        aspect-ratio: 1;
+        position: relative;
+    }
+
     @keyframes spawn {
         0% {
             scale: 110%;
@@ -152,24 +197,28 @@
 </style>
 
 <body>
-    <div style="float: left;width: min(max-content, 100%) ;height: fit-content;">
-        <div class="info" style="float:left;width: 100%;">
-            <div style="float: left;">
-                <p style="font-size: xxx-large;margin: 0;">2048 Units</p>
-            </div>
-            <div class="plate" style="float: left;padding: 0.5rem;">
-                <div style="float: left;margin: 0.2rem;">
-                    <p style="text-align: center;">SCORE</p>
-                    <p id="score" style="text-align: center;"></p>
+    <div class='flex1'>
+        <div class="info" id="info" style="flex:2;float:left;width: 100%;">
+            <div class="flex-col">
+                <div style="float: left;">
+                    <p style="font-size: xxx-large;margin: 0;">2048 Units</p>
                 </div>
-                <div style="float: left;margin: 0.2rem;">
-                    <p style="text-align: center;">COMPLEXITY</p>
-                    <p id="complexity" style="text-align: center;"></p>
+                <div class="plate" style="float: left;padding: 0.5rem;">
+                    <div class="flex2">
+                        <div style="float: left;margin: 0.2rem;flex:2">
+                            <p style="text-align: center;">SCORE</p>
+                            <p id="score" style="text-align: center;"></p>
+                        </div>
+                        <div style="float: left;margin: 0.2rem;flex:2">
+                            <p style="text-align: center;">COMPLEXITY</p>
+                            <p id="complexity" style="text-align: center;"></p>
+                        </div>
+                        <button id="buttonUndo" onclick="undo()" style="flex:1">UNDO</button>
+                    </div>
                 </div>
-                <button id="buttonUndo" onclick="undo()" style="flex:1">UNDO</button>
             </div>
         </div>
-        <div class="area" style="float: left;width: 100%;aspect-ratio: 1;position: relative;">
+        <div class="area">
             <div id="bg" class="grid"
                 style="width: 100%;aspect-ratio: 1;position: absolute;border-radius: 2%;background-color: #444444;">
                 <div id="bggrid" class="grid" style="width: 100%;height: 100%;position: absolute;">
@@ -183,32 +232,46 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div id="otherinfo" style="float: left;max-height: 100%;max-width:28.5rem;">
-        <div class="plate" style="float: inline-start;padding: 0.3rem;">
-            <p>Discovered Units:</p>
-            <div id="discoveredUnits" style="float: inline-start; width: 100%;height: auto;">
+        <div id="otherinfo" style="flex:2;float: left;max-height: 100%;">
+            <div class="flex-col">
+                <div class="plate" style="float: inline-start;padding: 0.3rem;">
+                    <p>Discovered Units:</p>
+                    <div id="discoveredUnits" style="float: inline-start; width: 100%;height: auto;">
 
+                    </div>
+                </div>
+
+                <div class="plate" style="float:inline-start;">
+                    <p>Save & Load:</p>
+                    <div class="flex2">
+                        <button onclick="exportState()" style="flex: 1;">
+                            Export
+                        </button>
+                        <button onclick="importState()" style="flex: 1;">
+                            Import
+                        </button>
+                        <button onclick="newGame()" style="flex: 1;">
+                            New Game
+                        </button>
+                    </div>
+                    <form>
+                        <textarea id="leveldata" style="flex:1">
+                        </textarea>
+                    </form>
+                    <div>
+                        <p>The game saves state automatically on quit.</p>
+                        <p>However undo history isn't saved.</p>
+                    </div>
+                </div>
+                <div class="plate" style="float:inline-start">
+                    <p>A game about physical units.</p>
+                    <a href="https://github.com/Blue-Beaker/2048-units"><p>Source Code</p></a>
+                </div> 
             </div>
         </div>
-
-        <div class="plate" style="float:inline-start;">
-            <p>Save & Load:</p>
-            <button onclick="saveGame()">
-                Save
-            </button>
-            <button onclick="loadGame()">
-                Load
-            </button>
-            <button onclick="newGame()">
-                New Game
-            </button>
-            <form>
-                <textarea id="leveldata" style="max-width: 30em;">
-
-                </textarea>
-            </form>
-        </div>
+    </div>
+    <div class="toast" id="toast">
+        TOAST INFO
     </div>
 </body>
 <script>
@@ -819,21 +882,27 @@
         savedata.cellsV2 = dumpGrid()
         return savedata
     }
-    function saveGame() {
+    function exportState() {
         document.getElementById("leveldata").value = (JSON.stringify(serialize()))
+        toast("Exported! Copy the code from the box below and save it somewhere!")
     }
     function loadData() {
         return JSON.parse(document.getElementById("leveldata").value)
     }
-    function loadGame() {
-        var savedData = loadData()
-        loadGameFromData(savedData)
-        logUndo()
+    function importState() {
+        try{
+            var savedData = loadData()
+            loadGameFromData(savedData)
+            toast("Loaded!")
+        }
+        catch(err){
+            toast("Paste the code in the box below first!")
+        }
     }
     function loadGameFromData(savedData) {
+        if (savedData.id != "2048units_savedata") return;
         clear()
         initGrid()
-        if (savedData.id != "2048units_savedata") return
         if (savedData.cellsV2 != null) {
             loadGrid(savedData.cellsV2)
         }
@@ -864,26 +933,33 @@
         updateRound()
     }
     //Save to cookie
-    function saveState(){
-        setCookie("state",JSON.stringify(serialize()))
+    function saveState() {
+        setCookie("state", JSON.stringify(serialize()))
     }
-    function loadStateFromCookie(){
+    function loadStateFromCookie() {
         loadGameFromData(JSON.parse(getCookie("state")))
     }
-    function setCookie(cname,cvalue){
-        document.cookie=cname+"="+cvalue+";SameSite=Strict;expires=Thu, 01 Jan 3000 00:00:00 GMT"
+    function setCookie(cname, cvalue) {
+        document.cookie = cname + "=" + cvalue + ";SameSite=Strict;expires=Thu, 01 Jan 3000 00:00:00 GMT"
     }
-    function removeCookie(cname){
-        document.cookie=cname+"=;SameSite=Strict;expires=Thu, 01 Jan 1970 00:00:00 GMT"
+    function removeCookie(cname) {
+        document.cookie = cname + "=;SameSite=Strict;expires=Thu, 01 Jan 1970 00:00:00 GMT"
     }
-    function getCookie(cname)
-    {
+    function getCookie(cname) {
         return document.cookie
             .split("; ")
-            .find((row) => row.startsWith(cname+"="))
+            .find((row) => row.startsWith(cname + "="))
             ?.split("=")[1];
     }
-
+    var lastToast=null;
+    function toast(text) {
+        if(lastToast){
+            clearTimeout(lastToast);
+        }
+        document.getElementById("toast").innerHTML="<div>"+text+"</div>"
+        document.getElementById("toast").style.setProperty("opacity","100%")
+        lastToast=setTimeout(()=>{document.getElementById("toast").style.setProperty("opacity","0%")},2000)
+    }
     //Init code
     window.addEventListener("keydown", onkeydown)
     document.getElementById("touchArea").addEventListener("touchstart", onTouch)
@@ -892,11 +968,11 @@
     document.getElementById("touchArea").addEventListener("mousedown", onTouch)
     document.getElementById("touchArea").addEventListener("mouseup", onTouch)
     document.getElementById("touchArea").addEventListener("contextmenu", (event) => { event.preventDefault() })
-    window.addEventListener("beforeunload", (event) => { event.preventDefault(); event.returnValue = ("Are you sure? unsaved progress will be lost!") })
+    window.addEventListener("beforeunload", (event) => { event.preventDefault(); event.returnValue = ("Are you sure? All undo history will be lost! However the state will be saved.") })
     //Resume last game if there is
-    if(getCookie("state")){
+    if (getCookie("state")) {
         loadStateFromCookie()
-    }else{
+    } else {
         newGame()
     }
 </script>
