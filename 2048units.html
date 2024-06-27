@@ -6,19 +6,45 @@
     <title>2048 Units</title>
 </head>
 <style type="text/css">
-    /* .grid{
-      background-color:#aaaaaa;
-    } */
-
-    .grid td {
-        background-color: #222222;
-    }
-
     body {
-        background-color: #222222;
+        background-color: #202020;
         width: 95%;
         height: 95%;
         color-scheme: dark;
+    }
+
+    .area {
+        /* width: 95vw;
+        aspect-ratio: 1;
+        min-width: 20em;
+        max-width: 95vh; */
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .basegrid {
+        --columns: 4;
+        --rows: 4;
+        /*
+        --fit-view-size: min( 95vh ,95vw );
+        width: calc( var(--fit-view-size) );
+        height: calc( var(--fit-view-size) );
+        font-size: calc( var(--fit-view-size) * 0.165 / max(var(--rows), var(--columns)));
+        */
+        --max-width: 95vw;
+        --max-height: 95vh;
+
+        width: calc( var(--fit-view-size) * (var(--columns) + 0.1) );
+        height: calc( var(--fit-view-size) * (var(--rows) + 0.1) );
+        --fit-view-size: min( var(--max-height) / ( var(--rows) + 0.1 ) , var(--max-width) / ( var(--columns) + 0.1 ));
+        border-radius: calc( var(--fit-view-size) * 0.1 );
+        background-color: hsl(0, 0%, 27%);
+        font-size: calc( var(--fit-view-size) / 6 );
+    }
+    .overgrid{
+        position: absolute;
     }
 
     .cell {
@@ -26,8 +52,8 @@
         border-style: none;
         text-align: center;
         position: absolute;
-        --margin: 2%;
-        --size: calc((100% - 2% * 5) / 4);
+        --margin: 0.5em;
+        --size: 4.5em;
         --x: 0;
         --y: 0;
         margin: var(--margin);
@@ -48,8 +74,13 @@
     }
 
     .bg {
-        background-color: #333333;
+        background-color: #303030;
         z-index: 1;
+    }
+    .immovable-cell{
+        transition: none;
+        -webkit-transition: none;
+        animation: none;
     }
 
     .info_cell {
@@ -59,12 +90,12 @@
         text-align: center;
         position: relative;
         float: left;
-        margin: 0.2rem;
-        width: 3em;
-        height: 3em;
+        margin: 0.3em;
+        width: 4.5em;
+        height: 4.5em;
         z-index: 3;
         offset-anchor: center;
-        font-size: large;
+        font-size: x-small;
         text-align: center;
     }
 
@@ -73,7 +104,7 @@
         text-align: center;
         margin: 0px;
         position: absolute;
-        font-size: 1rem;
+        font-size: 1.5em;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -60%);
@@ -84,48 +115,56 @@
         text-align: center;
         margin: 0px;
         position: absolute;
-        font-size: 1rem;
+        font-size: 1em;
         top: 90%;
         left: 90%;
         transform: translate(-100%, -100%);
     }
 
     .largeFont {
-        font-size: 2rem;
+        font-size: 1.5em;
     }
 
     .plate {
-        background-color: #333333;
-        border-radius: 0.7rem;
+        background-color: #303030;
+        border-radius: 0.7em;
         border-style: none;
         z-index: 1;
-        margin: 0.5rem;
+        margin: 0.5em;
+    }
+
+    .circle {
+        background: #808080;
+        border-radius: 50%;
+        height: 0.5em;
+        width: 0.5em;
+        position: absolute;
     }
 
     .toast {
-        background-color: #444444;
-        box-shadow: 0 0 1rem 0 #000000;
+        background-color: #404040;
+        box-shadow: 0 0 1em 0 #000000;
         position: fixed;
-        right: 1rem;
-        bottom: 1rem;
-        border-radius: 0.7rem;
+        right: 1em;
+        bottom: 1em;
+        border-radius: 0.7em;
         border-style: none;
         z-index: 1;
-        margin: 0.5rem;
-        padding: 1rem;
+        margin: 0.5em;
+        padding: 1em;
         opacity: 0%;
         z-index: 99;
         transition: 0.3s ease-in;
-        max-width: calc(100vw - 5rem);
+        max-width: calc(100vw - 5em);
     }
 
 
     textarea {
         font-family: sans-serif;
-        background-color: #222222;
+        background-color: #202020;
         color: #ffffff;
-        border-radius: 0.5rem;
-        margin: 0.3rem;
+        border-radius: 0.5em;
+        margin: 0.3em;
         border-width: 0;
     }
 
@@ -136,17 +175,17 @@
 
     p {
         text-align: center;
-        margin: 0.2rem;
+        margin: 0.2em;
         width: 100%;
     }
 
     button {
         color: #ffffff;
         background-color: #606060;
-        margin: 0.2rem;
-        border-radius: 0.5rem;
+        margin: 0.2em;
+        border-radius: 0.5em;
         border-width: 0;
-        padding: 0.5rem;
+        padding: 0.5em;
     }
 
     button:hover {
@@ -154,7 +193,7 @@
     }
 
     button:active {
-        background-color: #222222;
+        background-color: #202020;
     }
 
     .flex1 {
@@ -176,15 +215,6 @@
         flex-direction: column;
     }
 
-    .area {
-        width: 95vw;
-        min-width: 20rem;
-        max-width: 95vh;
-        flex: 4;
-        aspect-ratio: 1;
-        position: relative;
-    }
-
     @keyframes spawn {
         0% {
             scale: 110%;
@@ -198,18 +228,18 @@
 
 <body>
     <div class='flex1'>
-        <div class="info" id="info" style="flex:2;float:left;width: 100%;">
+        <div class="info" id="info_header" style="flex:2;float:left;order:0;">
             <div class="flex-col">
                 <div style="float: left;">
                     <p style="font-size: xxx-large;margin: 0;">2048 Units</p>
                 </div>
-                <div class="plate" style="float: left;padding: 0.5rem;">
+                <div class="plate" style="float: left;padding: 0.5em;">
                     <div class="flex2">
-                        <div style="float: left;margin: 0.2rem;flex:2">
+                        <div style="float: left;margin: 0.2em;flex:2">
                             <p style="text-align: center;">SCORE</p>
                             <p id="score" style="text-align: center;"></p>
                         </div>
-                        <div style="float: left;margin: 0.2rem;flex:2">
+                        <div style="float: left;margin: 0.2em;flex:2">
                             <p style="text-align: center;">COMPLEXITY</p>
                             <p id="complexity" style="text-align: center;"></p>
                         </div>
@@ -218,25 +248,25 @@
                 </div>
             </div>
         </div>
-        <div class="area">
-            <div id="bg" class="grid"
-                style="width: 100%;aspect-ratio: 1;position: absolute;border-radius: 2%;background-color: #444444;">
-                <div id="bggrid" class="grid" style="width: 100%;height: 100%;position: absolute;">
+        <div class="area" style="order:1;">
+            <div id="basegrid" class="grid basegrid">
+                <div id="bggrid" class="grid overgrid">
 
                 </div>
-                <div id="gamegrid" class="grid" style="width: 100%;height: 100%;position: absolute;">
-
-                </div>
-                <div id="touchArea" style="width: 100%;height: 100%;position: absolute;z-index: 100;">
+                <div id="gamegrid" class="grid overgrid">
 
                 </div>
             </div>
+            <div id="touchArea" class="overgrid" style="z-index: 100;
+            width: 100%;
+            height: 100%;">
+                
+            </div>
         </div>
-        <div id="otherinfo" style="flex:2;float: left;max-height: 100%;">
-            <div class="flex-col">
-                <div class="plate" style="float: inline-start;padding: 0.3rem;">
+        <div id="otherinfo" class="flex-col" style="flex:2;float: left;max-height: 98%;order:3;">
+                <div class="plate" style="float: inline-start;padding: 0.3em;">
                     <p>Discovered Units:</p>
-                    <div id="discoveredUnits" style="float: inline-start; width: 100%;height: auto;">
+                    <div id="discoveredUnits" style="float: inline-start;height: auto;">
 
                     </div>
                 </div>
@@ -250,9 +280,6 @@
                         <button onclick="importState()" style="flex: 1;">
                             Import
                         </button>
-                        <button onclick="newGame()" style="flex: 1;">
-                            New Game
-                        </button>
                     </div>
                     <form>
                         <textarea id="leveldata" style="flex:1">
@@ -262,12 +289,23 @@
                         <p>The game saves state automatically on quit.</p>
                         <p>However undo history isn't saved.</p>
                     </div>
+
+                </div>
+                <div class="plate">
+                    Grid size: <input id="gridWidthSet" type="number" name="Columns" min="3" max="16"
+                        value="4" size="3">×
+                    <input id="gridHeightSet" type="number" name="Rows" min="3" max="16"
+                        value="4" size="3">
+                    <button onclick="newGame()" style="flex: 1;">
+                        New Game
+                    </button>
                 </div>
                 <div class="plate" style="float:inline-start">
                     <p>A game about physical units.</p>
-                    <a href="https://github.com/Blue-Beaker/2048-units"><p>Source Code</p></a>
-                </div> 
-            </div>
+                    <a href="https://github.com/Blue-Beaker/2048-units">
+                        <p>Source Code</p>
+                    </a>
+                </div>
         </div>
     </div>
     <div class="toast" id="toast">
@@ -284,8 +322,13 @@
     const gamegrid = document.getElementById("gamegrid")
     const bggrid = document.getElementById("bggrid")
     const discoveredUnitsElement = document.getElementById("discoveredUnits")
-    const WIDTH = 4
-    const HEIGHT = 4
+
+    const GRID_WIDTH_SETTER = document.getElementById("gridWidthSet")
+    const GRID_HEIGHT_SETTER = document.getElementById("gridHeightSet")
+    var WIDTH = 4
+    var HEIGHT = 4
+
+    var CELLS_PER_ROUND = 1   //Number of cells spawned after every move. Turn this to 0 for puzzle mode
 
     var debug = false
 
@@ -386,7 +429,7 @@
         logDebug(event)
         if (wait) { return }
         if (document.activeElement instanceof HTMLTextAreaElement) { return }
-
+        if (document.activeElement instanceof HTMLInputElement) { return }
         if (KEYMAPPING[event.key] != null) {
             move(KEYMAPPING[event.key])
         } else if (event.key == "Backspace" || event.key == "z") {
@@ -454,6 +497,9 @@
         if (units.A != null) {
             color += units.A * 0x27
         }
+        if(isUnitImmovable(units)) {
+            color -= 0x202020
+        }
         return color.toString(16)
     }
     //Logic
@@ -488,30 +534,31 @@
 
     const unitNameDict = {
         m1: ["m", "L"],
-        m2: ["m²", "S"],
-        m3: ["m³", "V"],
+        m2: ["m&#x00B2;", "S"],
+        m3: ["m&#x00B3;", "V"],
         s1: ["s", "t"],
         s_1: ["Hz", "f"],
         m1s_1: ["m/s", "v"],
-        m1s_2: ["m/s²", "a"],
+        m1s_2: ["m/s&#x00B2;", "a"],
         kg1: ["kg", "m"],
-        m_3kg1: ["kg/m³", "ρ"],
+        m_3kg1: ["kg/m&#x00B3;", "&#x03C1;"],
         m1s_2kg1: ["N", "F,G"],
-        m1s_1kg1: ["<div style='font-size:80%;'>kg⋅m/s\nN⋅s</div>", "P,I"],
+        m1s_1kg1: ["<div style='font-size:0.8em;'>kg&#x22C5;m/s\nN&#x22C5;s</div>", "P,I"],
         m_1s_2kg1: ["Pa", "p"],
         m2s_2kg1: ["J", "E,W,Q"],
         m2s_3kg1: ["W", "P"],
         A1: ["A", "I"],
         s1A1: ["C", "Q"],
         m_1A1: ["A/m", "H"],
-        m2s_3kg1A_1: ["V", "U,E,φ"],
+        m2s_3kg1A_1: ["V", "U,E,&#x03C6;"],
         m1s_3kg1A_1: ["V/m", "E"],
         m2s_3kg1A_2: ["Ω", "R"],
         m_2s4kg_1A2: ["F", "C"],
         s_2kg1A_1: ["T", "B"],
-        m2s_2kg1A_1: ["Wb", "Φ"],
+        m2s_2kg1A_1: ["Wb", "&#x03C6;"],
+        wl1:[" ",""],   //Wall, immovable
     }
-    const unitBase = ["m", "s", "kg", "A"]
+    const unitBase = ["m", "s", "kg", "A","wl"]
     //Unit IDs and names
     function getUnitID(units) {
         var unitID = ""
@@ -554,6 +601,9 @@
         }
         return name
     }
+    function isUnitImmovable(units){
+        return (units.wl != null && units.wl != 0)    //Immovable if unit is a wall
+    }
     //Cell
     class cellGrid {
         constructor(x, y, units = { m: 1 }) {
@@ -575,9 +625,17 @@
             this.updatePosition()
             setCell(x, y, this)
         }
+        isImmovable(){
+            return isUnitImmovable(this.units)    //Immovable if unit is a wall
+        }
         updateVisuals() {
+            if(this.isImmovable()){
+                this.cell.classList.add("immovable-cell")
+                this.cell.innerHTML = "<div class=circle style='left:0.5em;top:0.5em;' ></div><div class=circle style='right:0.5em;top:0.5em;'></div><div class=circle style='left:0.5em;bottom:0.5em;'></div><div class=circle style='right:0.5em;bottom:0.5em;'></div>"
+            }else{
             this.cell.innerHTML = "<div class='cellLabel largeFont'>" + this.getName() + "</div>" + "<div class='cellCornerMark'>" + this.getSymbol() + "</div>"
-            this.cell.style.backgroundColor = "#" + this.getColor()
+            }
+            this.cell.style.setProperty("background","#" + this.getColor())
         }
         updatePosition() {
             this.cell.style.setProperty("--x", this.x)
@@ -599,6 +657,9 @@
         }
         canMerge(obj, dir) {
             if (obj instanceof cellGrid) {
+                if(this.isImmovable() || obj.isImmovable()){
+                    return false
+                }
                 if (dir == DIR_UP) {
                     return getUnitName(divide(obj.units, this.units)) != null
                 } else if (dir == DIR_DOWN) {
@@ -609,6 +670,9 @@
             }
         }
         move(dir) {
+            if(this.isImmovable()){
+                return false
+            }
             var y2 = this.y
             var x2 = this.x
             var success = 0
@@ -661,6 +725,9 @@
     }
     //init scripts
     function initGrid() {
+        var basegrid = document.getElementById("basegrid")
+        basegrid.style.setProperty("--columns", WIDTH)
+        basegrid.style.setProperty("--rows", HEIGHT)
         cells = []
         for (let y = 0; y < HEIGHT; y++) {
             var row = []
@@ -693,6 +760,8 @@
         gameState.score = 0
     }
     function newGame() {
+        WIDTH = GRID_WIDTH_SETTER.value
+        HEIGHT = GRID_HEIGHT_SETTER.value
         clear()
         resetVariables()
         initGrid()
@@ -717,14 +786,14 @@
                 }
             }
         } else if (dir == DIR_LEFT) {
-            for (let x = 0; x < HEIGHT; x++) {
-                for (let y = 0; y < WIDTH; y++) {
+            for (let x = 0; x < WIDTH; x++) {
+                for (let y = 0; y < HEIGHT; y++) {
                     trymove(x, y, dir)
                 }
             }
         } else if (dir == DIR_RIGHT) {
-            for (let x = HEIGHT - 1; x >= 0; x--) {
-                for (let y = 0; y < WIDTH; y++) {
+            for (let x = WIDTH - 1; x >= 0; x--) {
+                for (let y = 0; y < HEIGHT; y++) {
                     trymove(x, y, dir)
                 }
             }
@@ -733,7 +802,7 @@
             updateRound()
             wait = true
             setTimeout(() => {
-                spawnCells(1)
+                spawnCells(CELLS_PER_ROUND)
                 afterRound()
                 wait = false
             }, 200);
@@ -763,7 +832,7 @@
                     }
                     var units = cell.units
                     var unitID = getUnitID(cell.units)
-                    if (!gameState.discoveredUnits.includes(unitID)) {
+                    if (!gameState.discoveredUnits.includes(unitID) && !isUnitImmovable(cell.units)) {
                         pushDiscovered(unitID)
                     }
                 }
@@ -782,7 +851,10 @@
         var newDiscovered = document.createElement("div")
         newDiscovered.style.backgroundColor = "#" + getColor(getUnitFromID(unitID))
         newDiscovered.classList.add("info_cell")
-        newDiscovered.innerHTML = "<p class='cellLabel'>" + (getUnitNameFromID(unitID) || unitID) + "</p>"
+        //newDiscovered.innerHTML = "<p class='cellLabel'>" + (getUnitNameFromID(unitID) || unitID) + "</p>"
+
+        newDiscovered.innerHTML = "<div class='cellLabel'>" + (getUnitNameFromID(unitID) || unitID) + "</div>" +
+         "<div class='cellCornerMark'>" + getSymbol(unitID) + "</div>"
         discoveredUnitsElement.appendChild(newDiscovered)
     }
     const unlockableUnits = {
@@ -839,7 +911,7 @@
             for (const x in row) {
                 var cell = row[x]
                 if (cell instanceof cellGrid) {
-                    rowToExport[x] = cell.units
+                    rowToExport[x] = cell.getUnitID()
                 } else {
                     rowToExport[x] = null
                 }
@@ -853,9 +925,12 @@
             var row = cellsV2[y]
             for (const x in row) {
                 var cell = row[x]
-                if (cell != null) {
-                    new cellGrid(x, y, cell)
-                }
+                if (typeof (cell) == 'string') {
+                    new cellGrid(x, y, getUnitFromID(cell))
+                } else
+                    if (cell != null) {
+                        new cellGrid(x, y, cell)
+                    }
             }
         }
     }
@@ -880,6 +955,9 @@
         savedata.id = "2048units_savedata"
         // savedata.cells=saveGridV1()
         savedata.cellsV2 = dumpGrid()
+        savedata.gridWidth = WIDTH
+        savedata.gridHeight = HEIGHT
+        savedata.cellsPerRound = CELLS_PER_ROUND
         return savedata
     }
     function exportState() {
@@ -890,17 +968,22 @@
         return JSON.parse(document.getElementById("leveldata").value)
     }
     function importState() {
-        try{
+        try {
             var savedData = loadData()
             loadGameFromData(savedData)
             toast("Loaded!")
         }
-        catch(err){
+        catch (err) {
             toast("Paste the code in the box below first!")
         }
     }
     function loadGameFromData(savedData) {
         if (savedData.id != "2048units_savedata") return;
+        WIDTH = savedData.gridWidth || 4
+        HEIGHT = savedData.gridHeight || 4
+        CELLS_PER_ROUND = savedData.cellsPerRound || 1
+        GRID_WIDTH_SETTER.value=WIDTH
+        GRID_HEIGHT_SETTER.value=HEIGHT
         clear()
         initGrid()
         if (savedData.cellsV2 != null) {
@@ -951,16 +1034,33 @@
             .find((row) => row.startsWith(cname + "="))
             ?.split("=")[1];
     }
-    var lastToast=null;
+    var lastToast = null;
     function toast(text) {
-        if(lastToast){
+        if (lastToast) {
             clearTimeout(lastToast);
         }
-        document.getElementById("toast").innerHTML="<div>"+text+"</div>"
-        document.getElementById("toast").style.setProperty("opacity","100%")
-        lastToast=setTimeout(()=>{document.getElementById("toast").style.setProperty("opacity","0%")},2000)
+        document.getElementById("toast").innerHTML = "<div>" + text + "</div>"
+        document.getElementById("toast").style.setProperty("opacity", "100%")
+        lastToast = setTimeout(() => { document.getElementById("toast").style.setProperty("opacity", "0%") }, 2000)
     }
+
+    function convertRemToPixels(rem) {    
+        return rem * parseFloat(getComputedStyle(document.documentElement).fontSize);
+    }
+    function onResize(){
+        if(window.innerWidth>window.innerHeight && window.innerWidth>convertRemToPixels(60)){
+            basegrid.style.setProperty("--max-width", "calc( 95vw - 45rem )") 
+            basegrid.style.setProperty("--max-height", "95vh")
+            document.getElementById("otherinfo").style.setProperty("max-height","95vh")
+        }else{
+            basegrid.style.setProperty("--max-width", "95vw")
+            basegrid.style.setProperty("--max-height", "calc( 95vh - 10rem )") 
+            document.getElementById("otherinfo").style.setProperty("max-height","98%")
+        }
+    }
+    window.addEventListener("resize",onResize)
     //Init code
+    onResize()
     window.addEventListener("keydown", onkeydown)
     document.getElementById("touchArea").addEventListener("touchstart", onTouch)
     document.getElementById("touchArea").addEventListener("touchmove", onTouch)
